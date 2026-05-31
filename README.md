@@ -49,6 +49,11 @@ type prompt → generate → download — so you can run a whole batch from one 
 - Paces generations and cools down automatically if Flow rate-limits.
 - Reference-image support is on the roadmap.
 
+## Credits
+
+Inspired by hans1801's Flow-automation concept (seen in a YouTube tutorial). This is an
+independent, from-scratch implementation.
+
 ## License
 
 MIT — see [LICENSE](./LICENSE).
