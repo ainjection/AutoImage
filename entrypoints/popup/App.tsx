@@ -36,7 +36,11 @@ function App() {
       if (res?.queue) setQueue(res.queue);
       if (typeof res?.relayOn === 'boolean') setRelayOn(res.relayOn);
     }).catch(() => {});
-    const ping = () => fetch('http://127.0.0.1:8766/health').then(r => setRelayUp(r.ok)).catch(() => setRelayUp(false));
+    const ping = () => {
+      fetch('http://127.0.0.1:8766/health').then(r => setRelayUp(r.ok)).catch(() => setRelayUp(false));
+      // nudge the background to poll the relay while the popup is open (fast path)
+      browser.runtime.sendMessage({ type: 'RELAY_TICK' }).catch(() => {});
+    };
     ping();
     const pingTimer = setInterval(ping, 5000);
     const listener = (msg: any) => { if (msg?.type === 'QUEUE_UPDATED') setQueue(msg.queue); };

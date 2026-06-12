@@ -105,6 +105,13 @@ export default defineBackground(() => {
         return true;
       }
 
+      case 'RELAY_TICK': {
+        // popup-driven fast tick while the popup is open (5s); alarm covers closed.
+        relayTick();
+        sendResponse({ ok: true });
+        return true;
+      }
+
       case 'RELAY_SETKEY': {
         const { key } = message as { key: string };
         relayKey = (key || '').trim() || null;
@@ -405,7 +412,7 @@ async function relayTick() {
 
 function startRelayPolling() {
   // 0.5 min is the MV3 alarm floor; fine for hands-off batch jobs. Also tick once now.
-  chrome.alarms.create("relayPoll", { periodInMinutes: 0.5 });
+  chrome.alarms.create("relayPoll", { periodInMinutes: 1 });
   relayTick();
 }
 
