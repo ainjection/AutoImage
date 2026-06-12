@@ -89,11 +89,17 @@ export default defineBackground(() => {
         relayOn = !!on;
         if (tabId) activeTabId = tabId;
         if (relayOn) {
-          // fetch the relay's API key over loopback, then start polling
           fetch(RELAY_URL + '/key.txt').then(r => r.ok ? r.text() : null).then(k => {
-            if (k) relayKey = k.trim();
-          }).catch(() => {});
-          startRelayPolling();
+            relayKey = k ? k.trim() : relayKey;
+            chrome.storage.local.set({ relayOn: true, relayKey, relayTabId: activeTabId });
+            startRelayPolling();
+          }).catch(() => {
+            chrome.storage.local.set({ relayOn: true, relayTabId: activeTabId });
+            startRelayPolling();
+          });
+        } else {
+          chrome.storage.local.set({ relayOn: false });
+          chrome.alarms.clear("relayPoll");
         }
         sendResponse({ relayOn });
         return true;
@@ -369,25 +375,42 @@ function ingestRelayJob(job: { id: string; project: string; mode: string; settin
   relayReport("RUNNING", { log: `picked up ${items.length} scenes` });
 }
 
-function startRelayPolling() {
-  if (relayPoll) return;
-  relayPoll = setInterval(async () => {
-    if (!relayOn) return;
-    // only pull a new job when idle (nothing in flight) and a Flow tab is known
-    const busy = queue.some(q => q.status === "PENDING" || q.status === "IN_PROGRESS" || q.status === "READY");
-    if (busy || !activeTabId) return;
-    // a finished relay job: report DONE before pulling the next
-    if (relayJobId) {
-      await relayReport("DONE", { log: "all scenes downloaded" });
-      relayJobId = null;
+// MV3 service workers are ephemeral — a setInterval dies when Chrome idles the
+// worker, which is exactly when the relay needs to poll. chrome.alarms wakes the
+// worker on schedule, and state is persisted so it survives a worker restart.
+async function relayTick() {
+  const st = await chrome.storage.local.get(["relayOn", "relayKey", "relayTabId", "relayJobId"]);
+  if (!st.relayOn) return;
+  relayOn = true;
+  relayKey = st.relayKey ?? relayKey;
+  if (st.relayTabId) activeTabId = st.relayTabId;
+  relayJobId = st.relayJobId ?? relayJobId;
+  const busy = queue.some(q => q.status === "PENDING" || q.status === "IN_PROGRESS" || q.status === "READY");
+  if (busy || !activeTabId) return;
+  if (relayJobId) {
+    await relayReport("DONE", { log: "all scenes downloaded" });
+    relayJobId = null;
+    await chrome.storage.local.remove("relayJobId");
+  }
+  try {
+    const r = await relayFetch("/next");
+    if (!r.ok) return;
+    const job = await r.json();
+    if (job && job.id) {
+      await chrome.storage.local.set({ relayJobId: job.id });
+      ingestRelayJob(job);
     }
-    try {
-      const r = await relayFetch("/next");
-      if (!r.ok) return;
-      const job = await r.json();
-      if (job && job.id) ingestRelayJob(job);
-    } catch { /* relay not running — stay quiet */ }
-  }, 4000);
+  } catch { /* relay not running — stay quiet */ }
+}
+
+function startRelayPolling() {
+  // 0.5 min is the MV3 alarm floor; fine for hands-off batch jobs. Also tick once now.
+  chrome.alarms.create("relayPoll", { periodInMinutes: 0.5 });
+  relayTick();
+}
+
+if (chrome.alarms?.onAlarm) {
+  chrome.alarms.onAlarm.addListener(a => { if (a.name === "relayPoll") relayTick(); });
 }
 
 function broadcastQueue() {
