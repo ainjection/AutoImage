@@ -26,16 +26,22 @@ function App() {
   const [useRefImg, setUseRefImg] = useState(false);
   const [frameImages, setFrameImages] = useState<{ name: string; dataUrl: string }[]>([]);
   const [settings, setSettings] = useState<any>(null);
+  const [relayOn, setRelayOn] = useState(false);
+  const [relayUp, setRelayUp] = useState(false);
   const [refImage, setRefImage] = useState('');   // dataURL of the reference image
   const [refName, setRefName] = useState('');
 
   useEffect(() => {
     browser.runtime.sendMessage({ type: 'GET_QUEUE' }).then((res: any) => {
       if (res?.queue) setQueue(res.queue);
+      if (typeof res?.relayOn === 'boolean') setRelayOn(res.relayOn);
     }).catch(() => {});
+    const ping = () => fetch('http://127.0.0.1:8766/health').then(r => setRelayUp(r.ok)).catch(() => setRelayUp(false));
+    ping();
+    const pingTimer = setInterval(ping, 5000);
     const listener = (msg: any) => { if (msg?.type === 'QUEUE_UPDATED') setQueue(msg.queue); };
     browser.runtime.onMessage.addListener(listener);
-    return () => browser.runtime.onMessage.removeListener(listener);
+    return () => { browser.runtime.onMessage.removeListener(listener); clearInterval(pingTimer); };
   }, []);
 
   const onFile = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -138,6 +144,13 @@ function App() {
   const done = queue.filter(q => q.status === 'DOWNLOADED' || q.status === 'GENERATED').length;
   const pct = total ? Math.round((done / total) * 100) : 0;
 
+  const toggleRelay = async () => {
+    const next = !relayOn;
+    const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+    await browser.runtime.sendMessage({ type: 'RELAY_TOGGLE', on: next, tabId: tab?.id });
+    setRelayOn(next);
+  };
+
   const box: React.CSSProperties = { padding: 16, width: 380, display: 'flex', flexDirection: 'column', gap: 14, fontFamily: 'system-ui, sans-serif' };
 
   return (
@@ -150,6 +163,18 @@ function App() {
           📖 How to use
         </button>
       </div>
+
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '8px 10px', borderRadius: 8, background: relayOn ? '#e6f4ea' : '#f8f9fa', border: '1px solid ' + (relayOn ? '#34a853' : '#dadce0') }}>
+        <span style={{ fontSize: 12, fontWeight: 600, color: '#3c4043' }}>
+          🔌 Relay {relayUp ? '' : '(server off)'}
+        </span>
+        <button onClick={toggleRelay} disabled={!relayUp}
+          style={{ fontSize: 12, padding: '4px 12px', borderRadius: 14, cursor: relayUp ? 'pointer' : 'not-allowed', border: 'none', fontWeight: 600,
+            background: relayOn ? '#34a853' : (relayUp ? '#1a73e8' : '#dadce0'), color: relayOn || relayUp ? '#fff' : '#5f6368' }}>
+          {relayOn ? 'Connected — hands-off' : 'Connect'}
+        </button>
+      </div>
+      {relayOn && <div style={{ fontSize: 11, color: '#9aa0a6', marginTop: -8 }}>Keep this Flow tab open. Jobs sent to the relay run here automatically.</div>}
 
       <div style={{ display: 'flex', gap: 6 }}>
         {(['image', 'video', 'whisk'] as const).map(m => (

@@ -34,6 +34,12 @@ let frameImagesMap = new Map<string, string>();     // popup-uploaded local imag
 const uploadedFrameNames = new Set<string>();       // names already uploaded to Flow this batch
 let pendingSettings: any = null;                    // JSON "settings" block, applied before first scene
 let settingsApplied = false;
+// --- relay bridge (hands-off jobs from external tools) ---
+const RELAY_URL = "http://127.0.0.1:8766";
+let relayKey: string | null = null;
+let relayOn = false;
+let relayJobId: string | null = null;     // job currently being run for the relay
+let relayPoll: ReturnType<typeof setInterval> | null = null;
 // Whisk: send each prompt, then auto-download the FINISHED images (they're <img> with base64
 // data: URLs once rendered — directly downloadable). "Failed" tiles have no img and are skipped.
 // Advance when this prompt's tile slots have settled (finished or failed). Cap 2 saved per prompt.
@@ -75,8 +81,30 @@ export default defineBackground(() => {
   browser.runtime.onMessage.addListener((message, _sender, sendResponse) => {
     switch (message?.type) {
       case 'GET_QUEUE':
-        sendResponse({ queue });
+        sendResponse({ queue, relayOn, relayJobId });
         return true;
+
+      case 'RELAY_TOGGLE': {
+        const { on, tabId } = message as { on: boolean; tabId?: number };
+        relayOn = !!on;
+        if (tabId) activeTabId = tabId;
+        if (relayOn) {
+          // fetch the relay's API key over loopback, then start polling
+          fetch(RELAY_URL + '/key.txt').then(r => r.ok ? r.text() : null).then(k => {
+            if (k) relayKey = k.trim();
+          }).catch(() => {});
+          startRelayPolling();
+        }
+        sendResponse({ relayOn });
+        return true;
+      }
+
+      case 'RELAY_SETKEY': {
+        const { key } = message as { key: string };
+        relayKey = (key || '').trim() || null;
+        sendResponse({ ok: true });
+        return true;
+      }
 
       case 'START_QUEUE': {
         const { prompts, tabId, projectName, mode, refImage, frameImages, settings } = message as { prompts: { scene_number: number; prompt: string; start_frame?: string; end_frame?: string; character?: string }[]; tabId: number; projectName?: string; mode?: GenMode; refImage?: string | null; frameImages?: { name: string; dataUrl: string }[]; settings?: unknown };
@@ -298,6 +326,68 @@ function hashString(s: string): number {
   let h = 0;
   for (let i = 0; i < s.length; i++) h = (h << 5) - h + s.charCodeAt(i) | 0;
   return h;
+}
+
+async function relayFetch(path: string, opts: RequestInit = {}) {
+  const headers = { "Content-Type": "application/json", ...(opts.headers || {}) } as Record<string, string>;
+  if (relayKey) headers["X-API-Key"] = relayKey;
+  return fetch(RELAY_URL + path, { ...opts, headers });
+}
+
+async function relayReport(status: string, extra: Record<string, unknown> = {}) {
+  if (!relayJobId) return;
+  try {
+    await relayFetch("/status", { method: "POST", body: JSON.stringify({ id: relayJobId, status, ...extra }) });
+  } catch { /* relay down — ignore */ }
+}
+
+// Ingest a relay job exactly as if the popup sent START_QUEUE.
+function ingestRelayJob(job: { id: string; project: string; mode: string; settings: unknown; scenes: any[] }) {
+  relayJobId = job.id;
+  activeTabId = activeTabId;  // keep whatever tab is active (Flow)
+  currentMode = (job.mode === "video" || job.mode === "whisk") ? (job.mode as GenMode) : "image";
+  frameImagesMap = new Map();
+  uploadedFrameNames.clear();
+  pendingSettings = job.settings ?? null;
+  settingsApplied = false;
+  refImageDataUrl = null;
+  refAttached = false;
+  const project = sanitizeProject(job.project) || "Relay";
+  const items: QueueItem[] = job.scenes.map((p: any, i: number) => ({
+    id: `${project}-${p.scene_number ?? i + 1}-${Math.abs(hashString(String(p.prompt))).toString(36)}`,
+    scene_number: p.scene_number ?? i + 1,
+    prompt: p.prompt,
+    status: "PENDING",
+    project,
+    mode: currentMode,
+    start_frame: p.start_frame,
+    end_frame: p.end_frame,
+    character: p.character,
+  }));
+  queue = [...queue, ...items];
+  broadcastQueue();
+  relayReport("RUNNING", { log: `picked up ${items.length} scenes` });
+}
+
+function startRelayPolling() {
+  if (relayPoll) return;
+  relayPoll = setInterval(async () => {
+    if (!relayOn) return;
+    // only pull a new job when idle (nothing in flight) and a Flow tab is known
+    const busy = queue.some(q => q.status === "PENDING" || q.status === "IN_PROGRESS" || q.status === "READY");
+    if (busy || !activeTabId) return;
+    // a finished relay job: report DONE before pulling the next
+    if (relayJobId) {
+      await relayReport("DONE", { log: "all scenes downloaded" });
+      relayJobId = null;
+    }
+    try {
+      const r = await relayFetch("/next");
+      if (!r.ok) return;
+      const job = await r.json();
+      if (job && job.id) ingestRelayJob(job);
+    } catch { /* relay not running — stay quiet */ }
+  }, 4000);
 }
 
 function broadcastQueue() {
