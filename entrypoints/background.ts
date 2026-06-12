@@ -380,6 +380,7 @@ function ingestRelayJob(job: { id: string; project: string; mode: string; settin
   queue = [...queue, ...items];
   broadcastQueue();
   relayReport("RUNNING", { log: `picked up ${items.length} scenes` });
+  if (activeTabId) initAndStart(activeTabId);   // actually kick off generation
 }
 
 // MV3 service workers are ephemeral — a setInterval dies when Chrome idles the
