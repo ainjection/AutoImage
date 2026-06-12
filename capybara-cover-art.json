@@ -1,0 +1,11 @@
+{
+  "project": "capybara-cover-art",
+  "scenes": [
+    { "scene_number": 1, "prompt": "Cute kawaii capybara wearing yellow sunglasses, sitting and smiling. Chibi kawaii style, soft brown fur, pink blush cheeks, simple flat cartoon vector illustration with a thick clean dark outline, full body, centered, plain solid pure white background, no text, no shadow, no border." },
+    { "scene_number": 2, "prompt": "Cute kawaii capybara with a pink flower on its head, sitting and smiling. Chibi kawaii style, soft brown fur, pink blush cheeks, simple flat cartoon vector illustration with a thick clean dark outline, full body, centered, plain solid pure white background, no text, no shadow, no border." },
+    { "scene_number": 3, "prompt": "Cute kawaii capybara lying down relaxed with a small orange fruit balanced on its head. Chibi kawaii style, soft brown fur, pink blush cheeks, simple flat cartoon vector illustration with a thick clean dark outline, full body, centered, plain solid pure white background, no text, no shadow, no border." },
+    { "scene_number": 4, "prompt": "Cute kawaii capybara wearing a small red bow tie, sitting and smiling. Chibi kawaii style, soft brown fur, pink blush cheeks, simple flat cartoon vector illustration with a thick clean dark outline, full body, centered, plain solid pure white background, no text, no shadow, no border." },
+    { "scene_number": 5, "prompt": "Cute kawaii capybara holding a slice of watermelon. Chibi kawaii style, soft brown fur, pink blush cheeks, simple flat cartoon vector illustration with a thick clean dark outline, full body, centered, plain solid pure white background, no text, no shadow, no border." },
+    { "scene_number": 6, "prompt": "Cute tiny kawaii baby capybara, sitting and smiling happily. Chibi kawaii style, soft brown fur, pink blush cheeks, simple flat cartoon vector illustration with a thick clean dark outline, full body, centered, plain solid pure white background, no text, no shadow, no border." }
+  ]
+}

@@ -1,0 +1,25 @@
+{
+  "project": "fatbob-1percent-video",
+  "scenes": [
+    {
+      "scene_number": 1,
+      "prompt": "PANEL 1 - WIDE SHOT, static, low angle, late night: Fat Bob slumped low on the green sofa in a dark living room, face lit blue by his phone, slowly scrolling, tiny tired movements - the rut. Consistent with the Fat Bob character board: a friendly 2D adult-cartoon everyman, big round pot belly, three wavy hairs, dot eyes, blue t-shirt, dark trousers, trainers. Modern full-colour cartoon, bold clean outlines, soft flat shading. Keep him identical to the board. Smooth natural animation, ~8-10 seconds, no text, no captions, no watermark."
+    },
+    {
+      "scene_number": 2,
+      "prompt": "PANEL 2 - MEDIUM SHOT, slow push-in on his face: Fat Bob sits up as a glowing lightbulb showing '1%' flicks on above his head; his expression shifts from glum to curious and hopeful - the spark. Consistent with the Fat Bob character board: a friendly 2D adult-cartoon everyman, big round pot belly, three wavy hairs, dot eyes, blue t-shirt, dark trousers, trainers. Modern full-colour cartoon, bold clean outlines, soft flat shading. Keep him identical to the board. Smooth natural animation, ~8-10 seconds, no text, no captions, no watermark."
+    },
+    {
+      "scene_number": 3,
+      "prompt": "PANEL 3 - MEDIUM CLOSE-UP, low angle, morning light: Fat Bob crouched by the front door lacing up his trainers with a determined little smile, then starting to stand - the first step. Consistent with the Fat Bob character board: a friendly 2D adult-cartoon everyman, big round pot belly, three wavy hairs, dot eyes, blue t-shirt, dark trousers, trainers. Modern full-colour cartoon, bold clean outlines, soft flat shading. Keep him identical to the board. Smooth natural animation, ~8-10 seconds, no text, no captions, no watermark."
+    },
+    {
+      "scene_number": 4,
+      "prompt": "PANEL 4 - CLOSE-UP on his hand and a wall calendar: Fat Bob ticks the calendar, revealing a growing streak of check marks, a small proud smile - the habit building. Consistent with the Fat Bob character board: a friendly 2D adult-cartoon everyman, big round pot belly, three wavy hairs, dot eyes, blue t-shirt, dark trousers, trainers. Modern full-colour cartoon, bold clean outlines, soft flat shading. Keep him identical to the board. Smooth natural animation, ~8-10 seconds, no text, no captions, no watermark."
+    },
+    {
+      "scene_number": 5,
+      "prompt": "PANEL 5 - WIDE SHOT, low angle, slow pan up: Fat Bob transformed, standing tall outdoors with arms raised in triumph, bright sunny background, big confident grin - the payoff. Consistent with the Fat Bob character board: a friendly 2D adult-cartoon everyman, big round pot belly, three wavy hairs, dot eyes, blue t-shirt, dark trousers, trainers. Modern full-colour cartoon, bold clean outlines, soft flat shading. Keep him identical to the board. Smooth natural animation, ~8-10 seconds, no text, no captions, no watermark."
+    }
+  ]
+}

@@ -1,0 +1,21 @@
+{
+  "project": "test-sheet-grid",
+  "scenes": [
+    {
+      "scene_number": 1,
+      "prompt": "Storyboard sheet, a clean 2x3 grid of 6 sequential panels numbered 1 to 6, comic storyboard layout with thin panel borders on a white background. The SAME character appears in every panel, identical design and outfit throughout: the main character. Setting: A modern, bright interior and a stark, urban industrial landscape.. Sequence of shots — 1) A man in a suit stands pensively by a large, curved window, looking out at lush trees. 2) The word 'PROBLEMS' in green, digital-style text, overlays the scene, formed by smaller 'LIFE' words. 3) The scene cuts to a black and white close-up of abstract patterns on paper being fed into a machine. 4) The paper continues to move, revealing more of the repetitive, geometric shapes. 5) A dramatic low-angle shot reveals a towering, dark, brutalist-style building against a grey sky. 6) The imposing structure of the building dominates the frame, emphasizing its scale and design.. Cinematic framing, consistent character design across all 6 panels, clear readable action. Only small panel numbers, no other text."
+    },
+    {
+      "scene_number": 2,
+      "prompt": "Storyboard sheet, a clean 2x3 grid of 6 sequential panels numbered 1 to 6, comic storyboard layout with thin panel borders on a white background. The SAME character appears in every panel, identical design and outfit throughout: the main character. Setting: From an ornate building interior to an aerial night city view and a digital Earth display. Sequence of shots — 1) People walk through a grand, vertically lit hall with ornate architecture. 2) The camera moves forward, emphasizing the height and design of the building's interior. 3) The scene abruptly cuts from the indoor setting to an expansive outdoor view. 4) An aerial night shot reveals a vast landscape dotted with countless city lights. 5) The view transitions to a dark screen, suggesting a digital interface. 6) A stylized image of Earth appears on the screen, surrounded by green dots and the word 'PROBLE...'.. Cinematic framing, consistent character design across all 6 panels, clear readable action. Only small panel numbers, no other text."
+    },
+    {
+      "scene_number": 3,
+      "prompt": "Storyboard sheet, a clean 2x3 grid of 6 sequential panels numbered 1 to 6, comic storyboard layout with thin panel borders on a white background. The SAME character appears in every panel, identical design and outfit throughout: the main character. Setting: Various indoor settings, including a modern home and an industrial workshop. Sequence of shots — 1) The clip begins with a dark screen, possibly fading in. 2) A bright, minimalist interior with white walls and a framed picture is revealed. 3) A person in a white shirt walks through a narrow, arched passage past bookshelves. 4) The scene abruptly cuts to a bustling industrial-style workshop. 5) A man in glasses intently works on assembling a bicycle wheel. 6) Another man focuses on intricate work at a bench with a laptop nearby.. Cinematic framing, consistent character design across all 6 panels, clear readable action. Only small panel numbers, no other text."
+    },
+    {
+      "scene_number": 4,
+      "prompt": "Storyboard sheet, a clean 2x3 grid of 6 sequential panels numbered 1 to 6, comic storyboard layout with thin panel borders on a white background. The SAME character appears in every panel, identical design and outfit throughout: the main character. Setting: Lab and ocean research settings. Sequence of shots — 1) A laptop displays a 3D modeling interface for an underwater device. 2) Parameters and data related to the device are visible on the screen. 3) A digital animation of a complex, dotted conical structure rotates. 4) The intricate 3D model continues its rotation, showing its layered design. 5) A man in a wetsuit sits on a research boat in the open ocean. 6) He writes notes in a notebook, surrounded by diving equipment.. Cinematic framing, consistent character design across all 6 panels, clear readable action. Only small panel numbers, no other text."
+    }
+  ]
+}

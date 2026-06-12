@@ -1,0 +1,13 @@
+{
+  "project": "test-storyboards",
+  "scenes": [
+    {
+      "scene_number": 1,
+      "prompt": "panel A"
+    },
+    {
+      "scene_number": 2,
+      "prompt": "panel B"
+    }
+  ]
+}

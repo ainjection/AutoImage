@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AutoImage — How To Use It</title>
+<style>
+  :root { --gold: #c9a24b; --ink: #1f2430; --muted: #6b7280; --bg: #fafaf8; --code: #f1f1f4; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--ink); line-height: 1.6; }
+  .top-bar { height: 6px; background: var(--gold); }
+  .wrap { max-width: 760px; margin: 0 auto; padding: 40px 28px 80px; }
+  h1 { font-size: 34px; margin-bottom: 8px; }
+  .sub { color: var(--muted); margin-bottom: 36px; font-size: 15px; }
+  h2 { font-size: 19px; margin: 36px 0 12px; padding-left: 12px; border-left: 4px solid var(--gold); }
+  p { margin-bottom: 12px; font-size: 15px; }
+  ul { margin: 0 0 14px 22px; }
+  li { margin-bottom: 7px; font-size: 15px; }
+  pre { background: var(--code); border-radius: 8px; padding: 14px 16px; font-size: 13px; overflow-x: auto; margin-bottom: 14px; color: #2a2a55; }
+  .note { background: #fdf6e6; border: 1px solid #ecd9a8; border-radius: 8px; padding: 12px 14px; font-size: 14px; margin-bottom: 14px; }
+  .path { font-family: Consolas, monospace; background: var(--code); padding: 1px 6px; border-radius: 4px; font-size: 13px; }
+  footer { margin-top: 48px; color: var(--muted); font-size: 13px; border-top: 1px solid #e5e5e5; padding-top: 16px; }
+</style>
+</head>
+<body>
+<div class="top-bar"></div>
+<div class="wrap">
+
+<h1>AutoImage — How To Use It</h1>
+<p class="sub">The one-file workflow: you write a JSON file of scenes, AutoImage feeds them to Google Flow one by one, and every finished image or video lands in a tidy folder on your PC. You never touch the Flow prompt box.</p>
+
+<h2>The basic loop (everything follows this)</h2>
+<ul>
+  <li>Open your Flow project in Chrome (<span class="path">labs.google/fx/tools/flow</span>).</li>
+  <li>Click the AutoImage extension icon (top right of Chrome).</li>
+  <li>Pick the <b>MODE</b>: Image, Video or Whisk.</li>
+  <li>Type a <b>Project Name</b> — this becomes the download folder name.</li>
+  <li>Load your JSON file. It shows how many scenes it found.</li>
+  <li>Press <b>Start</b>. Walk away.</li>
+</ul>
+<p>Everything downloads automatically to <span class="path">Downloads/AutoImage/&lt;your project name&gt;/</span> — images as <span class="path">scene_01.jpg</span>, videos as <span class="path">scene_01.mp4</span>. When a scene finishes, the next one fires on its own.</p>
+
+<h2>The JSON file — simplest form</h2>
+<p>A JSON is just a list of scenes. The simplest file that works:</p>
+<pre>{
+  "scenes": [
+    { "scene_number": 1, "prompt": "A red fox in the snow, watercolour style" },
+    { "scene_number": 2, "prompt": "The same fox curled up asleep, watercolour style" }
+  ]
+}</pre>
+<p>That's it. Image mode: each prompt makes one image. Video mode: each prompt makes one clip. Repeat your style words in every prompt so the look stays locked.</p>
+
+<h2>Automatic settings — the "settings" block</h2>
+<p>Add a <span class="path">settings</span> block to your JSON and AutoImage sets Flow's prompt bar for you — mode, sub-mode, model, duration, aspect ratio and outputs. No more touching the tabs:</p>
+<pre>{
+  "settings": {
+    "mode": "video",
+    "video_mode": "frames",
+    "model": "Veo 3.1 - Fast",
+    "duration": 8,
+    "aspect": "16:9",
+    "count": 1
+  },
+  "scenes": [ ... ]
+}</pre>
+<ul>
+  <li><b>mode:</b> "image" or "video" &nbsp;·&nbsp; <b>video_mode:</b> "frames" or "ingredients"</li>
+  <li><b>model:</b> "Veo 3.1 - Fast", "Veo 3.1 - Lite", "Veo 3.1 - Quality", "Omni Flash", "Nano Banana 2"</li>
+  <li><b>duration:</b> 4 / 6 / 8 / 10 &nbsp;·&nbsp; <b>aspect:</b> "16:9", "9:16", "1:1", "4:3", "3:4" &nbsp;·&nbsp; <b>count:</b> 1-4</li>
+  <li>No settings block? Whatever Flow is currently set to gets used — set it by hand like before.</li>
+</ul>
+
+<h2>Video mode basics</h2>
+<p>Either use the settings block above, or set Flow's prompt bar yourself before pressing Start.</p>
+<ul>
+  <li><b>INGREDIENTS</b> — reference images guide the clip (storyboard sheets, characters).</li>
+  <li><b>FRAMES</b> — give it a start picture and (optionally) an end picture; it animates between them.</li>
+  <li><b>Models:</b> Veo 3.1 Fast is the workhorse (10 credits / 8s). Use VEO for start/end frames — Omni Flash ignores end frames.</li>
+  <li>Videos download themselves and the queue moves on — no clicking.</li>
+</ul>
+
+<h2>Feature: start_frame / end_frame &nbsp;(Video &gt; FRAMES mode)</h2>
+<p>Add these to a scene and AutoImage loads the pictures into Flow's Start and End slots before prompting. The value is either the <b>name of an image already in your Flow project</b>, or the name of a picture you dropped into the popup's <b>"Frame images"</b> box (no need for it to exist in Flow — AutoImage uploads it the first time a scene uses it). Name files simply: <span class="path">image1.png</span> → reference it as <span class="path">"start_frame": "image1"</span>.</p>
+<pre>{
+  "scenes": [{
+    "scene_number": 1,
+    "prompt": "He flips the pancake; it sticks to the ceiling. No dialogue, ambient sound only.",
+    "start_frame": "marco_pour",
+    "end_frame": "marco_ceiling"
+  }]
+}</pre>
+<ul>
+  <li>Flow must be in Video &gt; FRAMES mode, model = Veo 3.1.</li>
+  <li>Unlocks before/after transformations, and seamless chains — use the last frame of clip 1 as the start frame of clip 2.</li>
+</ul>
+
+<h2>Feature: character &nbsp;(Image mode, or Video &gt; INGREDIENTS)</h2>
+<p>Attach a saved Flow Character to every generation so the design never drifts. The value is the character's name exactly as it appears in Flow's Characters tab.</p>
+<pre>{
+  "scenes": [{
+    "scene_number": 1,
+    "prompt": "He carries a wobbling tower of pancakes across the kitchen. No dialogue, ambient only.",
+    "character": "test1"
+  }]
+}</pre>
+<p><b>Creating a character</b> (once per project): left sidebar → Characters → New, then describe them, Upload a photo, or "Add from Project" to use an image you already generated. Name it, add a one-line "how they act" description, press Done.</p>
+<p><b>What it looks like when it runs:</b> the character appears as a small picture chip in the prompt box just before the text goes in — the same thing you get manually by typing <span class="path">@</span> in the prompt and picking them, or by using the + button. Three doors, same room: the character rides along with the generation.</p>
+<div class="note"><b>Important:</b> characters belong to ONE project. A character made in project A does not appear in project B. And the character feature does NOT work in Video &gt; FRAMES mode (that mode has no attach button) — use Ingredients.</div>
+
+<h2>House rules for video prompts</h2>
+<ul>
+  <li>End every video prompt with: <i>"No dialogue, no speech, no voices — ambient sound only."</i> Veo generates audio, and stray speech fights your voiceover.</li>
+  <li>If a character SHOULD talk, give the exact line: <span class="path">he says: "right, that's done."</span></li>
+  <li>Lead the prompt with the CHARACTER, not the action — that's what stops design drift.</li>
+  <li>Test generations at the cheapest settings (1x, Fast model); only go big once the look is approved.</li>
+</ul>
+
+<h2>If something goes wrong</h2>
+<ul>
+  <li>Scene stuck or skipped: check the extension popup — failed scenes show in red with a reason.</li>
+  <li>Wrong/no image attached: the name in your JSON must match the file/character name in Flow's media library.</li>
+  <li>After an extension update: <span class="path">chrome://extensions</span> → AutoImage → press the refresh circle. Without this you're running old code.</li>
+  <li>Whisk mode pauses between prompts on purpose — that's rate-limit pacing, not a bug.</li>
+</ul>
+
+<footer>AutoImage — batch image &amp; video generation for Google Flow.</footer>
+</div>
+</body>
+</html>
